@@ -15,21 +15,21 @@ fn generate_game() -> io::Result<()> {
     let mut stdout = io::stdout();
     let code: u32 = rand::random_range(0..=10);
 
-    execute!(stdout, crossterm::style::Print("Guess the number between 0 and 10!\n"))?;
+    execute!(stdout, crossterm::style::Print("\nGuess the number between 0 and 10!\n"))?;
     let _ = stdout.flush();
 
     let _: () = loop {
         let guess = read_line();
         let Ok(input) = guess else {
-            execute!(stdout, crossterm::style::Print("Error reading input. Please try again.\n"))?;
+            execute!(stdout, crossterm::style::Print("\nError reading input. Please try again.\n"))?;
             continue;
         };
         let Ok(num) = input.parse::<u32>() else {
-            execute!(stdout, crossterm::style::Print("This isn't a number! Please try again.\n"))?;
+            execute!(stdout, crossterm::style::Print("\nThis isn't a number! Please try again.\n"))?;
             continue;
         };
         if check_code(num, code)? {
-            execute!(stdout, crossterm::style::Print("Correct! You've guessed the number!\n"))?;
+            execute!(stdout, crossterm::style::Print("\nCorrect! You've guessed the number!\n"))?;
             break;
         }
     };
@@ -38,7 +38,7 @@ fn generate_game() -> io::Result<()> {
 
 fn check_code(guess: u32, code: u32) -> io::Result<bool> {
 	let mut stdout = stdout();
-	execute!(stdout, Print(format!("Your guess: {}\n", guess)))?;
+	execute!(stdout, Print(format!("\nYour guess: {}\n", guess)))?;
 
 	match guess.cmp(&code) {
 	    std::cmp::Ordering::Less => { execute!(stdout, Print("Bigger!\n"))?; Ok(false) }
@@ -63,7 +63,7 @@ fn main() -> io::Result<()> {
                     break;
                 }
                 "n" => {
-                    execute!(stdout, crossterm::style::Print("Exiting...\n"))?;
+                    execute!(stdout, crossterm::style::Print("\nExiting...\n"))?;
                     break;
                 }
                 _ => {}
@@ -81,8 +81,23 @@ fn read_line() -> Result<String, ()> {
 	loop {
 		match event::read() {
 			Ok(Event::Key(k)) if k.kind == KeyEventKind::Press => match k.code {
-				KeyCode::Char(c) => buf.push(c),
-				KeyCode::Backspace => { buf.pop(); }
+                KeyCode::Char(c) => {
+                    buf.push(c);
+                    execute!(stdout(), Print(c)).unwrap();
+                    stdout().flush().unwrap();
+                }
+                KeyCode::Backspace => {
+                    if buf.pop().is_some() {
+                        // Move cursor back and clear the character
+                        execute!(
+                            stdout(),
+                            cursor::MoveLeft(1),
+                            terminal::Clear(ClearType::UntilNewLine)
+                        )
+                        .unwrap();
+                        stdout().flush().unwrap();
+                    }
+                }
 				KeyCode::Enter => return Ok(buf),
 				_ => {}
 			},
