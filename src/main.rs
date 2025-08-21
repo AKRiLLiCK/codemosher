@@ -1,39 +1,38 @@
-use std::{io::{self, stdout, Write}};
-use crossterm::{
-	cursor::{self}, event::{
-        self, KeyEventKind, Event, KeyCode
-    }, execute, style::Print, terminal::{self, ClearType}
-};
+use std::io::stdout;
+use std::io;
+use std::io::Write;
+use crossterm::cursor;
+use crossterm::event::KeyCode;
+use crossterm::execute;
+use crossterm::event;
+use crossterm::terminal;
+use crossterm::event::KeyEventKind;
+use crossterm::event::Event;
+use crossterm::terminal::ClearType;
+use crossterm::style::Print;
 
 fn generate_game() -> io::Result<()> {
     let mut stdout = io::stdout();
     let code: u32 = rand::random_range(0..=10);
 
     execute!(stdout, crossterm::style::Print("Guess the number between 0 and 10!\n"))?;
-    stdout.flush()?;
+    let _ = stdout.flush();
 
-    loop {
+    let _: () = loop {
         let guess = read_line();
-
-        let _guess: u32 = match guess {
-            Ok(input) => match input.parse::<u32>() {
-                Ok(num) => num,
-                Err(_) => {
-                    execute!(stdout, crossterm::style::Print("This isn't a number! Please try again.\n"))?;
-                    continue;
-                }
-            },
-            Err(_) => {
-                execute!(stdout, crossterm::style::Print("Error reading input. Please try again.\n"))?;
-                continue;
-            }
+        let Ok(input) = guess else {
+            execute!(stdout, crossterm::style::Print("Error reading input. Please try again.\n"))?;
+            continue;
         };
-
-        if check_code(_guess, code)? {
+        let Ok(num) = input.parse::<u32>() else {
+            execute!(stdout, crossterm::style::Print("This isn't a number! Please try again.\n"))?;
+            continue;
+        };
+        if check_code(num, code)? {
             execute!(stdout, crossterm::style::Print("Correct! You've guessed the number!\n"))?;
             break;
         }
-    }
+    };
     Ok(())
 }
 
@@ -76,7 +75,6 @@ fn main() -> io::Result<()> {
 	stdout.flush()?;
 	Ok(())
 }
-
 
 fn read_line() -> Result<String, ()> {
 	let mut buf = String::new();
