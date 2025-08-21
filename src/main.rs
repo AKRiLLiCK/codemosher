@@ -16,7 +16,7 @@ fn main() {
 }
 
 fn generate_game() {
-    let code: u32 = rand::random_range(0..=10); // Correct random number generation
+    let code: u32 = rand::random_range(0..=10);
     println!("Guess the number between 0 and 10!");
 
     loop {
@@ -29,31 +29,31 @@ fn generate_game() {
             Ok(num) => num,
             Err(_) => {
                 println!("This isn't a number! Please try again.");
-                continue; // Prompt for a new guess
+                continue;
             }
         };
 
         if check_code(guess, code) {
-            break; // Exit the loop if the guess is correct
+            break;
         }
     }
 }
 
 fn check_code(guess: u32, code: u32) -> bool {
-    println!("Your guess: {}", guess); // Print the guess for clarity
+    println!("Your guess: {}", guess);
 
     match guess.cmp(&code) {
         std::cmp::Ordering::Less => {
-            println!("Bigger!"); // Provide feedback
-            false // Continue the game
+            println!("Bigger!");
+            false
         },
         std::cmp::Ordering::Equal => {
-            println!("You got it!"); // Correct guess
-            true // Indicate that the game is over
+            println!("You got it!");
+            true
         },
         std::cmp::Ordering::Greater => {
-            println!("Smaller!"); // Provide feedback
-            false // Continue the game
+            println!("Smaller!");
+            false
         },
     }
 }
