@@ -1,15 +1,5 @@
-use std::io::stdout;
-use std::io;
-use std::io::Write;
-use crossterm::cursor;
-use crossterm::event::KeyCode;
-use crossterm::execute;
-use crossterm::event;
-use crossterm::terminal;
-use crossterm::event::KeyEventKind;
-use crossterm::event::Event;
-use crossterm::terminal::ClearType;
-use crossterm::style::Print;
+use std::io::{self, Write, stdout};
+use crossterm::{*, event::{KeyCode, *}, terminal::*, style::*};
 
 fn generate_game() -> io::Result<()> {
     let mut stdout = io::stdout();
